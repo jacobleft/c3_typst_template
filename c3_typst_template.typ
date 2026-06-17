@@ -6,18 +6,26 @@
 #let logo-mae = asset-root + "/image2.png"
 #let logo-cuhk = asset-root + "/image1.png"
 
-#let theme-gray = rgb(89, 89, 89)
-#let theme-gray-dark = rgb(68, 68, 68)
-#let theme-ink = rgb(45, 45, 45)
+#let theme-font-heading = "Raleway"
+#let theme-font-body = "Lato"
+#let theme-ink = rgb(38, 38, 38)
+#let theme-muted = rgb(95, 95, 95)
+#let theme-soft = rgb(246, 247, 248)
+#let theme-paper = rgb(252, 252, 251)
+#let theme-line = rgb(218, 221, 224)
+#let theme-c3-red = rgb(159, 34, 42)
+#let theme-c3-blue = rgb(35, 93, 143)
+#let theme-gray = rgb(86, 86, 86)
+#let theme-gray-dark = rgb(55, 55, 55)
 
 #let navigation-logo-cluster() = align(right + horizon)[
   #stack(
     dir: ltr,
-    spacing: 0.28cm,
-    image(logo-c3, height: 0.82cm),
-    image(logo-curi, height: 0.82cm),
-    image(logo-mae, height: 0.82cm),
-    image(logo-cuhk, height: 0.82cm),
+    spacing: 0.2cm,
+    image(logo-c3, height: 0.64cm),
+    image(logo-curi, height: 0.64cm),
+    image(logo-mae, height: 0.64cm),
+    image(logo-cuhk, height: 0.64cm),
   )
 ]
 
@@ -36,25 +44,29 @@
         return
       }
       let current-page = here().page()
-      set text(size: 0.5em)
+      set text(size: 0.62em, weight: "medium")
       for (section, next-section) in sections.zip(sections.slice(1) + (none,)) {
-        set text(fill: if section.location().page() <= current-page
+        let active = (
+          section.location().page() <= current-page
           and (
             next-section == none
               or current-page < next-section.location().page()
-          ) {
-          primary
-        } else {
-          secondary
-        })
-        box(inset: 0.5em)[#link(
-          section.location(),
-          if short-heading {
-            utils.short-heading(self: self, section)
-          } else {
-            section.body
-          },
-        )<touying-link>]
+          )
+        )
+        set text(
+          fill: if active { primary } else { secondary },
+          weight: if active { "bold" } else { "regular" },
+        )
+        box(inset: (x: 0.48em, y: 0.3em))[
+          #link(
+            section.location(),
+            if short-heading {
+              utils.short-heading(self: self, section)
+            } else {
+              section.body
+            },
+          )<touying-link>
+        ]
       }
     }
     block(
@@ -64,13 +76,13 @@
       grid(
         align: left + horizon,
         columns: (1fr, auto),
-        rows: 1.8em,
+        rows: 1.42em,
         gutter: 0em,
         grid.cell(
           fill: background,
           body(),
         ),
-        block(fill: background, inset: 4pt, height: 100%, text(
+        block(fill: background, inset: (right: 0.25em), height: 100%, text(
           fill: primary,
           logo,
         )),
@@ -87,14 +99,14 @@
       fill: self.colors.primary-dark,
       width: 100%,
       radius: (top: 6pt),
-      inset: (top: 0.4em, bottom: 0.3em, left: 0.5em, right: 0.5em),
-      text(fill: self.colors.neutral-lightest, weight: "bold", title),
+      inset: (top: 0.34em, bottom: 0.28em, left: 0.62em, right: 0.62em),
+      text(font: theme-font-heading, fill: self.colors.neutral-lightest, weight: "bold", title),
     ),
 
     rect(
       fill: gradient.linear(
         self.colors.primary-dark,
-        self.colors.primary.lighten(90%),
+        self.colors.primary.lighten(88%),
         angle: 90deg,
       ),
       width: 100%,
@@ -102,10 +114,10 @@
     ),
 
     block(
-      fill: self.colors.primary.lighten(90%),
+      fill: self.colors.primary.lighten(91%),
       width: 100%,
       radius: (bottom: 6pt),
-      inset: (top: 0.4em, bottom: 0.5em, left: 0.5em, right: 0.5em),
+      inset: (top: 0.42em, bottom: 0.5em, left: 0.62em, right: 0.62em),
       it,
     ),
   )
@@ -115,6 +127,55 @@
   title: title,
   it,
 ))
+
+#let text-panel(body) = block(
+  width: 100%,
+  fill: theme-soft,
+  stroke: (paint: theme-line, thickness: 0.6pt),
+  radius: 5pt,
+  inset: (x: 0.52em, y: 0.42em),
+)[#body]
+
+#let eq-panel(body) = block(
+  width: 100%,
+  fill: theme-paper,
+  stroke: (paint: theme-line, thickness: 0.6pt),
+  radius: 5pt,
+  inset: (x: 0.42em, y: 0.34em),
+)[
+  #set text(size: 0.84em, fill: theme-ink)
+  #align(center)[#body]
+]
+
+#let fig-card(path, caption, height: 100%) = block(width: 100%, height: height)[
+  #grid(
+    rows: (1fr, auto),
+    row-gutter: 0.08cm,
+    [#image(path, width: 100%, height: 100%, fit: "contain")],
+    [#align(center)[#text(font: theme-font-body, size: 0.62em, fill: theme-muted)[#caption]]],
+  )
+]
+
+#let pair-card(left-path, left-caption, right-path, right-caption, height: 100%) = block(width: 100%, height: height)[
+  #grid(
+    columns: (1fr, 1fr),
+    rows: (1fr,),
+    column-gutter: 0.24cm,
+    fig-card(left-path, left-caption),
+    fig-card(right-path, right-caption),
+  )
+]
+
+#let triple-card(a-path, a-caption, b-path, b-caption, c-path, c-caption, height: 100%) = block(width: 100%, height: height)[
+  #grid(
+    columns: (1fr, 1fr, 1fr),
+    rows: (1fr,),
+    column-gutter: 0.18cm,
+    fig-card(a-path, a-caption),
+    fig-card(b-path, b-caption),
+    fig-card(c-path, c-caption),
+  )
+]
 
 #let slide(
   title: auto,
@@ -159,6 +220,7 @@
     self = utils.merge-dicts(
       self,
       config,
+      config-page(header: none),
     )
     self.store.title = none
     let info = self.info + args.named()
@@ -178,47 +240,63 @@
       show: std.align.with(left + horizon)
       block(
         width: 100%,
-        inset: (left: 1.5em, top: 1.2em, right: 1em),
-        stack(
-          dir: ttb,
-          spacing: 0.55em,
-          text(
-            font: "Raleway",
-            size: 28pt,
-            fill: black,
-            weight: "bold",
-            info.title,
-          ),
-          ..info.authors.map(author => text(
-            font: "Raleway",
-            size: 20pt,
-            fill: black,
-            author,
-          )),
-        ),
-      )
-      if info.institution != none {
-        v(0.45em)
-        block(
-          width: 100%,
-          inset: (left: 1.5em, right: 1em),
-          text(
-            font: "Raleway",
-            size: 16pt,
-            fill: theme-gray,
-            style: "italic",
-            info.institution,
-          ),
+        height: 100%,
+        inset: (x: 1.35em, y: 0.95em),
+      )[
+        #grid(
+          columns: (0.18cm, 1fr),
+          column-gutter: 0.58cm,
+          [
+            #rect(
+              width: 100%,
+              height: 100%,
+              fill: gradient.linear(theme-c3-red, theme-c3-blue, angle: 90deg),
+              radius: 1pt,
+            )
+          ],
+          [
+            #block(width: 100%)[
+              #navigation-logo-cluster()
+            ]
+            #v(1.05cm)
+            #stack(
+              dir: ttb,
+              spacing: 0.58em,
+              text(
+                font: theme-font-heading,
+                size: 31pt,
+                fill: theme-ink,
+                weight: "bold",
+                info.title,
+              ),
+              ..info.authors.map(author => text(
+                font: theme-font-heading,
+                size: 18pt,
+                fill: theme-ink,
+                weight: "regular",
+                author,
+              )),
+            )
+            #if info.institution != none {
+              v(0.52em)
+              block(
+                width: 72%,
+                text(
+                  font: theme-font-body,
+                  size: 13.2pt,
+                  fill: theme-muted,
+                  style: "italic",
+                  info.institution,
+                ),
+              )
+            }
+            #if extra != none {
+              v(0.52em)
+              block(width: 72%, text(size: 0.82em, extra))
+            }
+          ],
         )
-      }
-      if extra != none {
-        v(0.45em)
-        block(
-          width: 100%,
-          inset: (left: 1.5em, right: 1em),
-          text(size: 0.8em, extra),
-        )
-      }
+      ]
     }
     touying-slide(self: self, body)
   },
@@ -236,7 +314,7 @@
     self: self,
     config: config,
     std.align(
-      self.store.align,
+      left + horizon,
       components.adaptive-columns(
         text(
           fill: self.colors.primary,
@@ -294,7 +372,7 @@
 
 #let c3-theme(
   aspect-ratio: "4-3",
-  align: horizon,
+  align: top + left,
   alpha: 20%,
   title: self => utils.display-current-heading(depth: self.slide-level),
   header-right: self => navigation-logo-cluster(),
@@ -323,10 +401,10 @@
     )
   }
   let footer(self) = {
-    block(width: 100%, inset: (bottom: 0.35em))[
-      #std.align(right + bottom)[
-        #utils.call-or-display(self, self.store.footer)
-      ]
+    block(width: 100%, inset: (x: 2em, bottom: 0.46em))[
+      #line(length: 100%, stroke: (paint: theme-line, thickness: 0.45pt))
+      #v(0.18em)
+      #utils.call-or-display(self, self.store.footer)
     ]
   }
 
@@ -336,8 +414,8 @@
       header: header,
       footer: footer,
       header-ascent: 0em,
-      footer-descent: 0.15em,
-      margin: (top: 4.6em, bottom: 2em, x: 2.5em),
+      footer-descent: 0.08em,
+      margin: (top: 4.05em, bottom: 1.8em, x: 2.15em),
     ),
     config-common(
       slide-fn: slide,
@@ -345,11 +423,13 @@
     ),
     config-methods(
       init: (self: none, body) => {
-        set text(font: "Lato", size: 20pt, fill: rgb(89, 89, 89))
+        set text(font: theme-font-body, size: 18.5pt, fill: theme-muted)
+        set par(justify: false, leading: 0.62em)
         set list(marker: components.knob-marker(primary: self.colors.primary))
         show figure.caption: set text(size: 0.6em)
         show footnote.entry: set text(size: 0.6em)
-        show heading: set text(fill: self.colors.primary)
+        show strong: set text(fill: theme-ink, weight: "bold")
+        show heading: set text(font: theme-font-heading, fill: self.colors.primary, weight: "bold")
         show link: it => if type(it.dest) == str {
           set text(fill: self.colors.primary)
           it
@@ -364,10 +444,10 @@
       tblock: _tblock,
     ),
     config-colors(
-      primary: theme-gray,
+      primary: theme-c3-red,
       primary-dark: theme-gray-dark,
       secondary: rgb("#ffffff"),
-      tertiary: theme-gray,
+      tertiary: theme-c3-blue,
       neutral-lightest: rgb("#ffffff"),
       neutral-darkest: theme-ink,
     ),
@@ -384,16 +464,17 @@
       footer-d: footer-d,
       navigation: self => block(
         width: 100%,
-        fill: rgb(231, 230, 230),
-        inset: (top: 0.45em, bottom: 0.45em),
+        fill: theme-soft,
+        stroke: (bottom: (paint: theme-line, thickness: 0.5pt)),
+        inset: (top: 0.28em, bottom: 0.26em, x: 0.28em),
       )[
-        #set text(font: "Raleway", size: 17.8pt, fill: black)
+        #set text(font: theme-font-heading, size: 14.2pt, fill: theme-ink)
         #std.align(left + horizon)[
           #left-navigation(
             self: self,
-            primary: black,
-            secondary: rgb("#666666"),
-            background: rgb(231, 230, 230),
+            primary: theme-c3-red,
+            secondary: theme-muted,
+            background: theme-soft,
             logo: utils.call-or-display(self, self.store.header-right),
           )
         ]
@@ -401,22 +482,40 @@
       header: self => if self.store.title != none {
         block(
           width: 100%,
-          inset: (left: 1.5em, top: 0.15em, bottom: 0.4em),
+          inset: (left: 1.6em, right: 1.6em, top: 0.08em, bottom: 0.26em),
+        )[
+          #grid(
+            columns: (0.16cm, 1fr),
+            column-gutter: 0.34cm,
+            [#rect(width: 100%, height: 0.82cm, fill: theme-c3-red, radius: 1pt)],
+            [#text(
+              font: theme-font-heading,
+              fill: theme-ink,
+              weight: "bold",
+              size: 21.5pt,
+              utils.call-or-display(self, self.store.title),
+            )],
+          )
+        ]
+      },
+      footer: self => {
+        let footer-title = if self.info.short-title == auto {
+          self.info.title
+        } else {
+          self.info.short-title
+        }
+        grid(
+          columns: (1fr, auto),
+          align: (left + horizon, right + horizon),
+          text(font: theme-font-body, size: 9.2pt, fill: theme-muted)[#footer-title],
           text(
-            font: "Raleway",
-            fill: black,
-            weight: "bold",
-            size: 24pt,
-            utils.call-or-display(self, self.store.title),
+            font: theme-font-body,
+            size: 9.2pt,
+            fill: theme-muted,
+            context utils.slide-counter.display() + " / " + utils.last-slide-number,
           ),
         )
       },
-      footer: self => text(
-        font: "Lato",
-        size: 14pt,
-        fill: rgb(89, 89, 89),
-        context utils.slide-counter.display() + " / " + utils.last-slide-number,
-      ),
     ),
     ..args,
   )

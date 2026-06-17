@@ -29,6 +29,18 @@ The example imports the theme directly:
 )
 ```
 
+## Reusable Components
+
+The theme exports a compact set of slide helpers:
+
+- `#title-slide()` - C3-branded title slide
+- `#outline-slide()` - section outline slide
+- `#focus-slide[...]` - full-slide emphasis
+- `#text-panel[...]` - soft explanatory panel
+- `#eq-panel[...]` - centered equation panel
+- `#fig-card(...)`, `#pair-card(...)`, `#triple-card(...)` - image cards with consistent captions and gutters
+- `#tblock(title: ...)[...]` - titled callout block
+
 ## Requirements
 
 - Typst
